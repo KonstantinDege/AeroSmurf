@@ -4,7 +4,7 @@ module RaspiConnection
 using HTTP
 using JSON
 
-url_base = "127.0.0.1:4269"
+url_base = "ltraspi02.local:4269"
 PATH = "dump/data"
 
 # Upload a mission file
