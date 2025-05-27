@@ -5,6 +5,7 @@ using HTTP
 using JSON
 
 url_base = "127.0.0.1:4269"
+PATH = "dump/data"
 
 # Upload a mission file
 function upload_mission(file_path::String, url::String = "http://$url_base/mission")
@@ -37,6 +38,15 @@ function request_objects(url::String = "http://$url_base/found_objects")
 	end
 end
 
+function request_filtered_objects(url::String = "http://$url_base/found_objects_filtered")
+	resp = HTTP.get(url)
+	if resp.status == 200
+		return resp.body  # This is the raw image bytes
+	else
+		error("Failed to get objects: $(resp.status)")
+	end
+end
+
 # Request an image by filename
 function request_image(filename::String, url_base::String = "http://$url_base/images/")
 	url = url_base * filename
@@ -56,9 +66,15 @@ function read_json_lines(file_path)
 	end
 	return results
 end
-
+function save_filterd()
+	file = "$PATH/__data_filtered__.json"
+	response = RaspiConnection.request_filtered_objects()
+	open(file, "w") do f
+		write(f, response)
+	end
+end
 function get_obj_data()
-	file = tempname()
+	file = "$PATH/__data__.json"
 	response = request_objects()
 	open(file, "w") do f
 		write(f, response)
@@ -71,7 +87,7 @@ end
 
 
 function get_img_and_write(img)
-	file_path = "images/$img"
+	file_path = "$PATH/$img"
 	open(file_path, "w") do f
 		write(f, request_image(img))
 	end
@@ -82,7 +98,7 @@ function get_all_images(data)
 	for item in data
 		if haskey(item, "raw_path")
 			img = item["raw_path"]
-			if img ∈ readdir("images")
+			if img ∈ readdir(PATH)
 				println("Image $img already exists, skipping download.")
 			else
 				println("Downloading image: $img")
