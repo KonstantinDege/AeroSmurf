@@ -10,3 +10,10 @@ route("/admin", AdminController.index, named = :get_home)
 
 using AeroSmurf.BaseController
 route("/aerosmurf", BaseController.index)
+
+
+using AeroSmurf.ImageController
+route("/images", ImageController.main)
+
+using AeroSmurf.ObjectController
+route("/objects", ObjectController.main)

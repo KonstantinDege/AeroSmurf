@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Genie = "c43c736e-a2d1-11e8-161f-af95117fbd1e"
 GenieAuthentication = "e115e502-7e3a-11e9-29b2-aba8be6c6778"
@@ -17,4 +18,5 @@ PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 SearchLight = "340e8cb6-72eb-11e8-37ce-c97ebeb32050"
 SearchLightSQLite = "21a827c4-482a-11ea-3a19-4d2243a4a2c5"
 Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"
+StipplePivotTable = "adab0226-ee3c-44de-8f2f-393b1bf1e936"
 StippleUI = "a3c5d34a-b254-4859-a8fa-b86abb7e84a3"
