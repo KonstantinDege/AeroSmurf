@@ -14,11 +14,6 @@ function clear_path(path = FILE_PATH)
 end
 
 
-
-
-
-
-
 function get_data()
 	data = RaspiConnection.get_obj_data()
 	if data isa Vector
@@ -29,11 +24,19 @@ function get_data()
 
 end
 
-
 send = RaspiConnection.upload_mission
 
+function save_all()
+    RaspiConnection.save_filterd()
+    get_data()
+end
+
 send("test_mission.json")
-get = get_data
-
-
-RaspiConnection.save_filterd()
+println("""
+    Functions: 
+        send(file)
+        get_data
+        save_filterd
+""")
+    
+# RaspiConnection.save_filterd()

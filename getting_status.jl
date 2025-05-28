@@ -10,7 +10,7 @@ function get_status(con)
 	println("Status: ", m.text)
 end
 
-
+println("Starting Status Updates")
 while true
 	get_status(connection)
 end

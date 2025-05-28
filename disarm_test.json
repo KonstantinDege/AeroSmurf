@@ -1,0 +1,56 @@
+{
+    "$schema": "https://raw.githubusercontent.com/KonstantinDege/schemas/refs/heads/main/mission_schema.json",
+    "name": "ID14",
+    "description": "Disarm test. Start to flight_height: 1m, hover 5sec and land (3 times)",
+    "type": "list",
+    "parameter": {
+        "flight_height": 1
+    },
+    "commands": [
+        {
+            "action": "takeoff",
+            "commands": {
+                "altitude": 1
+            }
+        },
+        {
+            "action": "delay",
+            "commands": {
+                "time": 5
+            }
+        },
+        {
+            "action": "land_at"
+        },
+        {
+            "action": "takeoff",
+            "commands": {
+                "altitude": 1
+            }
+        },
+        {
+            "action": "delay",
+            "commands": {
+                "time": 5
+            }
+        },
+        {
+            "action": "land_at"
+        },
+        {
+            "action": "takeoff",
+            "commands": {
+                "altitude": 1
+            }
+        },
+        {
+            "action": "delay",
+            "commands": {
+                "time": 5
+            }
+        },
+        {
+            "action": "land_at"
+        }
+    ]
+}
