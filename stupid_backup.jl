@@ -31,7 +31,6 @@ function save_all()
     get_data()
 end
 
-send("test_mission.json")
 println("""
     Functions: 
         send(file)
