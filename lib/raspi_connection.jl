@@ -5,7 +5,7 @@ using HTTP
 using JSON
 
 url_base = "ltraspi02.local:4269"
-PATH = "public/dump/data"
+PATH = joinpath("public", "dump", "data")
 
 # Upload a mission file
 function upload_mission(file_path::String, url::String = "http://$url_base/mission")
