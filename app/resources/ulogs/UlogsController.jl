@@ -49,8 +49,7 @@ mkpath(FILE_PATH)
         if ! isempty(fileuploads)
             @info "File was uploaded: " fileuploads["name"]
 			push!(data_name_list, fileuploads["name"])
-			@push data_name_list
-			
+			data_name_list = data_name_list
 			
 			d = DataFrames.DataFrame(ULogAnalyser.ulog_analysis(fileuploads["path"]))
 			d.name = [fileuploads["name"]]
