@@ -110,7 +110,6 @@ end
 
 
 function rec_serialize(obj::Dict)
-	println("Dict serialization")
 	if haskey(obj, "src")
 		print("test")
 		src = obj["src"]
@@ -130,7 +129,6 @@ function rec_serialize(obj::Dict)
 	end
 end
 function rec_serialize(obj::Vector)
-	println("Vector serialization")
 	for item in obj
 		rec_serialize(item)
 	end
