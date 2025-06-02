@@ -16,18 +16,16 @@ function ui_mission()
 	[
 		card(
 			[cardsection([
-			uploader(
-				fieldname     = :fileuploads,
-				multiple      = true,
-				accept        = ".json",
-				autoupload    = true,
-				hideuploadbtn = true,
-				label         = "Upload datasets",
-				nothumbnails  = true,
-				style         = "max-width:95%;margin:0 auto",
-			)]),
-
-			cardsection([span("{{mission_content}}")]),
+					uploader(
+						fieldname     = :fileuploads,
+						multiple      = true,
+						accept        = ".json",
+						autoupload    = true,
+						hideuploadbtn = true,
+						label         = "Upload datasets",
+						nothumbnails  = true,
+						style         = "max-width:95%;margin:0 auto",
+					)]), cardsection([span("{{mission_content}}")]),
 				cardsection(
 					[select(
 						:mission_file, options = :data_name_list,
@@ -46,7 +44,7 @@ function ui_mission()
 end
 
 function ui()
-	[
+	return [
 		ui_con(),
 		separator(color = "primary"),
 		ui_mission(),

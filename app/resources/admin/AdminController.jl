@@ -73,6 +73,7 @@ using AeroSmurf.AdminViews
 
 
 function index()
+	authenticated!()
 	model = @init
 	page(model, AdminViews.ui) |> html
 end
