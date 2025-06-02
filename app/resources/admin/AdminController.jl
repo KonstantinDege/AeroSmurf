@@ -6,7 +6,8 @@ using GenieFramework
 using Stipple, Stipple
 
 using AeroSmurf: AeroSmurf, FILE_PATH
-
+using AeroSmurf.RaspiConnection: rec_serialize
+using JSON
 
 @app begin
 	@in PiIp = "ltraspi02.local:4269"
@@ -22,40 +23,46 @@ using AeroSmurf: AeroSmurf, FILE_PATH
 	@out Pi_status = false
 	@out mav_status = false
 
-	# @out upfiles = readdir(FILE_PATH)
-	# @out data_name_list = []
-	# @in mission_file = []
-	# @in upload_mission = false
 
-	# @onbutton upload_mission begin
-	# 	@info "Uploading mission file: $(mission_file["name"])"
-	# end
-	# @onchange fileuploads begin
-	# 	@info "File uploads changed: $(fileuploads)"
-	# end
-
-	@in mission_file = ""
+	@in mission_file = [""]
 	@in SendMission = false
 
+	@in fileuploads = Dict{String, String}()
 	@out data_name_list = readdir(FILE_PATH)
-	@out upfiles = readdir(FILE_PATH)
+	@out mission_content = ""
 	@onchange fileuploads begin
-		@info "File was uploaded: " fileuploads
 		if !isempty(fileuploads)
-			@info "File was uploaded: " fileuploads
-			filename = fileuploads["name"]
-
+			name = fileuploads["name"]
+			tmp  = fileuploads["path"]
 			try
+				# ensure the directory exists
 				isdir(FILE_PATH) || mkpath(FILE_PATH)
-				mv(fileuploads["path"], joinpath(FILE_PATH, filename), force = true)
-			catch e
-				@error "Error processing file: $e"
-				notify(__model__, "Error processing file: $(fileuploads["name"])")
+				# move (overwrite) into place
+				mv(tmp, joinpath(FILE_PATH, name); force = true)
+			catch err
+				@error "Error saving upload to disk: $err"
+				notify(model, "Error saving file $name")
 			end
-
-			fileuploads = Dict{AbstractString, AbstractString}()
+			fileuploads = Dict{String, String}()
 		end
-		upfiles = readdir(FILE_PATH)
+		# refresh listing
+		data_name_list = sort(readdir(FILE_PATH))
+	end
+	@onchange mission_file begin
+		@info "Selected mission file: $(mission_file)"
+		if !isempty(mission_file)
+			file_path = joinpath(FILE_PATH, mission_file[1])
+			if isfile(file_path)
+				data = JSON.parsefile(file_path)
+				rec_serialize(data["commands"])
+				delete!(data, raw"$schema")
+				mission_content = JSON.json(data)
+			else
+				mission_content = "File not found."
+			end
+		else
+			mission_content = ""
+		end
 	end
 	@onbutton SendMission begin
 		@info "SendMission to Pi at $(PiIp)"

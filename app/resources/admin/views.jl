@@ -1,5 +1,5 @@
 module AdminViews
-using Stipple, Stipple
+using Stipple, StippleUI
 using GenieFramework
 
 using AeroSmurf.AdminComponents: connect_item
@@ -15,24 +15,33 @@ end
 function ui_mission()
 	[
 		card(
-			[
-				uploader(multiple = true,
-					accept = ".json",
-					autoupload = true,
-					hideuploadbtn = true,
-					label = "Upload datasets",
-					nothumbnails = true
-				)],
+			[cardsection([
+			uploader(
+				fieldname     = :fileuploads,
+				multiple      = true,
+				accept        = ".json",
+				autoupload    = true,
+				hideuploadbtn = true,
+				label         = "Upload datasets",
+				nothumbnails  = true,
+				style         = "max-width:95%;margin:0 auto",
+			)]),
+
+			cardsection([span("{{mission_content}}")]),
+				cardsection(
+					[select(
+						:mission_file, options = :data_name_list,
+						label = "Mission File",
+						clearable = true),
+					btn(
+						"Send Mission", @click(:SendMission),
+						icon = "mail",
+						var"icon-right" = "send",
+						color = "orange", size = 4)]
+				),
+			],
+			style = "max-width:95%;margin:0 auto",
 		),
-		select(
-			:mission_file, options = :data_name_list,
-			label = "Mission File",
-			clearable = true),
-		btn(
-			"Send Mission", @click(:SendMission),
-			icon = "mail",
-			var"icon-right" = "send",
-			color = "orange", size = 4),
 	]
 end
 
