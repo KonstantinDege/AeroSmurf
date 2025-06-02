@@ -3,7 +3,7 @@ module AdminController
 using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Html
 
 using GenieFramework
-using Stipple, Stipple
+using Stipple, StippleUI
 
 using AeroSmurf: AeroSmurf, FILE_PATH
 using AeroSmurf.RaspiConnection: rec_serialize
