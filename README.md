@@ -38,6 +38,7 @@ Instructions on how to run and use AeroSmurf will be added here.
 
 ```bash
 ./bin/repl.bat
+StartLocalServer()
 # Add further installation steps here
 ```
 
