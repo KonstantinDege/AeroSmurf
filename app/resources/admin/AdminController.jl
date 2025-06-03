@@ -42,6 +42,7 @@ STATUS = Observable("")
 		@info "Connecting to Pi at $(PiIp)"
 		global RASPI_IP = PiIp
 		RASPI_Running[] = !RASPI_Running[]
+		Pi_status = RASPI_Running[]
 		if RASPI_Running[] @async start_async() end
 		@info RASPI_Running
 	end
