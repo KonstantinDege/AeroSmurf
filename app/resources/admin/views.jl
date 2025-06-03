@@ -8,7 +8,7 @@ function ui_con()
 	[
 		connect_item("Raspi", :PiIp, :PiConnect, :Pi_status),
 		separator(color = "primary"),
-		connect_item("Mav", :MavIp, :MavConnect, :MavStatus),
+		# connect_item("Mav", :MavIp, :MavConnect, :MavStatus),
 	]
 end
 
@@ -45,6 +45,13 @@ end
 
 function ui()
 	return [
+		card(
+			[
+				cardsection([
+					p("{{drone_status}}"),
+				])
+			]
+		),
 		ui_con(),
 		separator(color = "primary"),
 		ui_mission(),

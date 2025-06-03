@@ -49,3 +49,5 @@ db/*.sqlite
 .env
 dump/*
 public/uploads/*
+public/data/*
+

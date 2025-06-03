@@ -9,20 +9,46 @@ using AeroSmurf: AeroSmurf, FILE_PATH
 using AeroSmurf.RaspiConnection: rec_serialize
 using JSON
 
+using AeroSmurf.RaspiConnection
+using AeroSmurf.MavLink
+
+using AeroSmurf.RaspiConnection
+
+const LOGPATH = "public/data/dump/mav_log.log"
+RASPI_IP = ""
+RASPI_Running = Observable(false)
+QGCIP = ""
+QGC_Running = Observable(false)
+
+STATUS = Observable("")
+
 @app begin
 	@in PiIp = "ltraspi02.local:4269"
-	@in MavIp = "localhost:14550"
-	@in PiConnect = false
-	@in MavConnect = false
+	@in MavIp = "localhost:14445"
+	@in PiConnect = RASPI_Running[]
+	@in MavConnect = QGC_Running[]
 	@onbutton MavConnect begin
 		@info "Connecting to MAVLink at $(MavIp)"
+		if !QGC_Running[]
+			global QGCIP = MavIp
+			MavLink.start(QGCIP)
+			MavLink.update_obs(STATUS)
+			global QGC_Running[] = true
+		else
+			@info "already running"
+		end
 	end
 	@onbutton PiConnect begin
 		@info "Connecting to Pi at $(PiIp)"
+		global RASPI_IP = PiIp
+		RASPI_Running[] = !RASPI_Running[]
+		Pi_status = RASPI_Running[]
+		if RASPI_Running[] @async start_async() end
+		@info RASPI_Running
 	end
 	@out Pi_status = false
 	@out mav_status = false
-
+	@out drone_status = STATUS[]
 
 	@in mission_file = [""]
 	@in SendMission = false
@@ -66,15 +92,43 @@ using JSON
 	end
 	@onbutton SendMission begin
 		@info "SendMission to Pi at $(PiIp)"
+		if RASPI_Running[]
+			if !isempty(mission_file)
+				file_path = joinpath(FILE_PATH, mission_file[1])
+				RaspiConnection.upload_mission(file_path, RASPI_IP)
+			end
+		else
+			@info "not connected"
+		end
 	end
 end
+
+function start_async()
+	@async while RASPI_Running[]
+		RaspiConnection.save_all(RASPI_IP)
+		sleep(5)
+	end
+	@async while RASPI_Running[]
+		if isfile(LOGPATH)
+			open(LOGPATH, "r") do file
+				lines = readlines(file)
+				model.drone_status[] = lines[end]
+			end
+			sleep(1/10)
+		end
+	end
+
+end
+
+
+
 
 using AeroSmurf.AdminViews
 
 
 function index()
 	authenticated!()
-	model = @init
+	global model = @init
 	page(model, AdminViews.ui) |> html
 end
 
