@@ -14,22 +14,9 @@ function clear_path(path = FILE_PATH)
 end
 
 
-function get_data()
-	data = RaspiConnection.get_obj_data()
-	if data isa Vector
-		data = RaspiConnection.get_all_images(data)
-	else
-
-	end
-
-end
 
 send = RaspiConnection.upload_mission
 
-function save_all()
-    RaspiConnection.save_filterd()
-    get_data()
-end
 
 println("""
     Functions: 

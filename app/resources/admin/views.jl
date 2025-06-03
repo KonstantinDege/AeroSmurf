@@ -45,6 +45,7 @@ end
 
 function ui()
 	return [
+		p("{{drone_status}}"),
 		ui_con(),
 		separator(color = "primary"),
 		ui_mission(),
