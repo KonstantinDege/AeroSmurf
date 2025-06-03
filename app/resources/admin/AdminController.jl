@@ -14,6 +14,7 @@ using AeroSmurf.MavLink
 
 using AeroSmurf.RaspiConnection
 
+const LOGPATH = "public/data/dump/mav_log.log"
 RASPI_IP = ""
 RASPI_Running = Observable(false)
 QGCIP = ""
@@ -41,6 +42,7 @@ STATUS = Observable("")
 		@info "Connecting to Pi at $(PiIp)"
 		global RASPI_IP = PiIp
 		RASPI_Running[] = !RASPI_Running[]
+		if RASPI_Running[] @async start_async() end
 		@info RASPI_Running
 	end
 	@out Pi_status = false
@@ -100,14 +102,24 @@ STATUS = Observable("")
 	end
 end
 
-on(RASPI_Running) do s
-	@async if s
-		while RASPI_Running[]
-			RaspiConnection.save_all(RASPI_IP)
-			sleep(5)
+function start_async()
+	@async while RASPI_Running[]
+		RaspiConnection.save_all(RASPI_IP)
+		sleep(5)
+	end
+	@async while RASPI_Running[]
+		if isfile(LOGPATH)
+			open(LOGPATH, "r") do file
+				lines = readlines(file)
+				model.drone_status[] = lines[end]
+			end
+			sleep(1/10)
 		end
 	end
+
 end
+
+
 
 
 using AeroSmurf.AdminViews
@@ -115,7 +127,7 @@ using AeroSmurf.AdminViews
 
 function index()
 	authenticated!()
-	model = @init
+	global model = @init
 	page(model, AdminViews.ui) |> html
 end
 

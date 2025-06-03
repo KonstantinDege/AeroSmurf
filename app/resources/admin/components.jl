@@ -32,6 +32,9 @@ function connect_item(name, text, connect, status)
 				icon = "mail",
 				var"icon-right" = "send",
 				color = "blue", size = 4),
+		),
+		column(
+			p("{{$status}}")
 		)])
 end
 
