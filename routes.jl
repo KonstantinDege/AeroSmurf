@@ -19,6 +19,8 @@ route("/images", ImageController.main)
 using AeroSmurf.ObjectController
 route("/objects", ObjectController.main)
 
+using AeroSmurf.UlogsController
+route("/ulog", UlogsController.main)
 
 using AeroSmurf.OverviewController
 route("/overview", OverviewController.init)

@@ -4,9 +4,11 @@ module RaspiConnection
 using HTTP
 using JSON
 
+
 const url_base = "ltraspi02.local:4269"
 const PATH = "public/data/dump"
 mkpath(PATH)
+
 
 # Upload a mission file
 function upload_mission(file_path::String, url::String = url_base)
