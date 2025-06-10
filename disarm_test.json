@@ -6,6 +6,7 @@
     "parameter": {
         "flight_height": 1
     },
+    "action": "list",
     "commands": [
         {
             "action": "takeoff",

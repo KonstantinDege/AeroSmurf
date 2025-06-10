@@ -39,6 +39,7 @@ function request_objects(url::String = url_base)
 		return resp.body  # This is the raw image bytes
 	else
 		error("Failed to get objects: $(resp.status)")
+		1/0
 	end
 end
 

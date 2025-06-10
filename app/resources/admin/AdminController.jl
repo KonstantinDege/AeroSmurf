@@ -57,6 +57,7 @@ STATUS = Observable("")
 	@out data_name_list = readdir(FILE_PATH)
 	@out mission_content = ""
 	@onchange fileuploads begin
+		@info fileuploads
 		if !isempty(fileuploads)
 			name = fileuploads["name"]
 			tmp  = fileuploads["path"]

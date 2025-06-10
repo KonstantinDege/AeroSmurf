@@ -102,7 +102,7 @@ function add_to_scene(scene, json, allready_rendered, count, poses, origin)
 		end
         @info image["time"]
         llh_raw = get_xy(image["image_pos"][1:2]...) - origin - Point3f(11140.25, 0, 0.0)
-		pos = llh_raw + Point3f(0, 0, -image["height"])
+		pos = llh_raw + Point3f(0, 0, image["height"])
 
 		m, original_vecs = mesh_gen(gen_rotate(attitude), pos, 1e-4 * count)
 
