@@ -1,9 +1,8 @@
 module AdminController
 
-using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Html
+using GenieAuthentication
 
 using GenieFramework
-using Stipple, StippleUI
 
 using AeroSmurf: AeroSmurf, FILE_PATH
 using AeroSmurf.RaspiConnection: rec_serialize
@@ -53,14 +52,14 @@ STATUS = Observable("")
 	@in mission_file = [""]
 	@in SendMission = false
 
-	@in jsonuploads = Dict{String, String}()
+	@in fileuploads = Dict{String, String}()
 	@out data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	@out mission_content = ""
-	@onchange jsonuploads begin
-		@info "jsonuploads changed: $(jsonuploads)"
-		if !isempty(jsonuploads)
-			name = jsonuploads["name"]
-			tmp  = jsonuploads["path"]
+	@onchange fileuploads begin
+		@info "fileuploads changed: $(fileuploads)"
+		if !isempty(fileuploads)
+			name = fileuploads["name"]
+			tmp  = fileuploads["path"]
 			try
 				# ensure the directory exists
 				isdir(FILE_PATH) || mkpath(FILE_PATH)
@@ -70,7 +69,7 @@ STATUS = Observable("")
 				@error "Error saving upload to disk: $err"
 				notify(model, "Error saving file $name")
 			end
-			jsonuploads = Dict{String, String}()
+			fileuploads = Dict{String, String}()
 		end
 		# refresh listing
 		data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
@@ -90,6 +89,7 @@ STATUS = Observable("")
 		else
 			mission_content = ""
 		end
+		data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	end
 	@onbutton SendMission begin
 		@info "SendMission to Pi at $(PiIp)"

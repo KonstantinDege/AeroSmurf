@@ -5,7 +5,6 @@ route("/") do
 end
 
 using AeroSmurf.AdminController
-
 route("/admin", AdminController.index, named = :admin)
 
 using AeroSmurf.BaseController
@@ -24,3 +23,7 @@ route("/ulog", UlogsController.main)
 
 using AeroSmurf.OverviewController
 route("/overview", OverviewController.init)
+
+
+using AeroSmurf.MissionProposser
+route("/mission", MissionProposser.main)
