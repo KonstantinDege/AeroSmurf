@@ -6,7 +6,9 @@ using Sockets
 const FILE_PATH = joinpath("public", "uploads")
 mkpath(FILE_PATH)
 
-
+using JSONSchema
+using JSON: JSON
+const MISSION_SCHEMA = Schema(JSON.parsefile(raw"schemas/mission_schema.json"))
 
 const up = Genie.up
 export up

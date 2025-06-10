@@ -4,7 +4,8 @@ using GenieAuthentication
 
 using GenieFramework
 
-using AeroSmurf: AeroSmurf, FILE_PATH
+using JSONSchema: validate
+using AeroSmurf: AeroSmurf, FILE_PATH, MISSION_SCHEMA
 using AeroSmurf.RaspiConnection: rec_serialize
 using JSON
 
@@ -12,6 +13,7 @@ using AeroSmurf.RaspiConnection
 using AeroSmurf.MavLink
 
 using AeroSmurf.RaspiConnection
+
 
 const LOGPATH = "public/data/dump/mav_log.log"
 RASPI_IP = ""
@@ -82,7 +84,14 @@ STATUS = Observable("")
 				data = JSON.parsefile(file_path)
 				rec_serialize(data["commands"])
 				delete!(data, raw"$schema")
-				mission_content = JSON.json(data)
+				val = validate(MISSION_SCHEMA, data)
+				if isnothing(val)
+					@info "Mission file validated successfully."					
+					mission_content = JSON.json(data)
+				else
+					mission_content = "FAILED VALIDATION: $(val.path)"
+					@error "Validation error: $(val)"
+				end
 			else
 				mission_content = "File not found."
 			end
@@ -96,7 +105,11 @@ STATUS = Observable("")
 		if RASPI_Running[]
 			if !isempty(mission_file)
 				file_path = joinpath(FILE_PATH, mission_file[1])
-				RaspiConnection.upload_mission(file_path, RASPI_IP)
+				ret = RaspiConnection.upload_mission(file_path, RASPI_IP)
+				if !isnothing(ret)
+					@error "Error uploading mission: $ret"
+					notify(model, "Error uploading mission: $ret")
+				end
 			end
 		else
 			@info "not connected"
