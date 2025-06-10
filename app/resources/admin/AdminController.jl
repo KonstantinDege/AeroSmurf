@@ -53,13 +53,14 @@ STATUS = Observable("")
 	@in mission_file = [""]
 	@in SendMission = false
 
-	@in fileuploads = Dict{String, String}()
-	@out data_name_list = readdir(FILE_PATH)
+	@in jsonuploads = Dict{String, String}()
+	@out data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	@out mission_content = ""
-	@onchange fileuploads begin
-		if !isempty(fileuploads)
-			name = fileuploads["name"]
-			tmp  = fileuploads["path"]
+	@onchange jsonuploads begin
+		@info "jsonuploads changed: $(jsonuploads)"
+		if !isempty(jsonuploads)
+			name = jsonuploads["name"]
+			tmp  = jsonuploads["path"]
 			try
 				# ensure the directory exists
 				isdir(FILE_PATH) || mkpath(FILE_PATH)
@@ -69,10 +70,10 @@ STATUS = Observable("")
 				@error "Error saving upload to disk: $err"
 				notify(model, "Error saving file $name")
 			end
-			fileuploads = Dict{String, String}()
+			jsonuploads = Dict{String, String}()
 		end
 		# refresh listing
-		data_name_list = sort(readdir(FILE_PATH))
+		data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	end
 	@onchange mission_file begin
 		@info "Selected mission file: $(mission_file)"

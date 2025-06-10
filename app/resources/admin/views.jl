@@ -17,7 +17,7 @@ function ui_mission()
 		card(
 			[cardsection([
 					uploader(
-						fieldname     = :fileuploads,
+						fieldname     = :jsonuploads,
 						multiple      = true,
 						accept        = ".json",
 						autoupload    = true,

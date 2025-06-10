@@ -6,7 +6,7 @@ end
 
 using AeroSmurf.AdminController
 
-route("/admin", AdminController.index, named = :get_home)
+route("/admin", AdminController.index, named = :admin)
 
 using AeroSmurf.BaseController
 route("/aerosmurf", BaseController.index)
