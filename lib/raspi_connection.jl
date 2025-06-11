@@ -32,6 +32,7 @@ function upload_mission(file_path::String, url::String = url_base)
 		JSON.print(f, j)
 		# print(j)
 	end
+	ret = nothing
 	open(new) do json
 		headers = []
 		body = HTTP.Form([
