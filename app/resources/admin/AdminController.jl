@@ -1,11 +1,11 @@
 module AdminController
 
-using GenieAuthentication, Genie.Renderer, Genie.Exceptions, Genie.Renderer.Html
+using GenieAuthentication
 
 using GenieFramework
-using Stipple, StippleUI
 
-using AeroSmurf: AeroSmurf, FILE_PATH
+using JSONSchema: validate
+using AeroSmurf: AeroSmurf, FILE_PATH, MISSION_SCHEMA
 using AeroSmurf.RaspiConnection: rec_serialize
 using JSON
 
@@ -13,6 +13,7 @@ using AeroSmurf.RaspiConnection
 using AeroSmurf.MavLink
 
 using AeroSmurf.RaspiConnection
+
 
 const LOGPATH = "public/data/dump/mav_log.log"
 RASPI_IP = ""
@@ -54,10 +55,10 @@ STATUS = Observable("")
 	@in SendMission = false
 
 	@in fileuploads = Dict{String, String}()
-	@out data_name_list = readdir(FILE_PATH)
+	@out data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	@out mission_content = ""
 	@onchange fileuploads begin
-		@info fileuploads
+		@info "fileuploads changed: $(fileuploads)"
 		if !isempty(fileuploads)
 			name = fileuploads["name"]
 			tmp  = fileuploads["path"]
@@ -73,7 +74,7 @@ STATUS = Observable("")
 			fileuploads = Dict{String, String}()
 		end
 		# refresh listing
-		data_name_list = sort(readdir(FILE_PATH))
+		data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	end
 	@onchange mission_file begin
 		@info "Selected mission file: $(mission_file)"
@@ -83,20 +84,32 @@ STATUS = Observable("")
 				data = JSON.parsefile(file_path)
 				rec_serialize(data["commands"])
 				delete!(data, raw"$schema")
-				mission_content = JSON.json(data)
+				val = validate(MISSION_SCHEMA, data)
+				if isnothing(val)
+					@info "Mission file validated successfully."					
+					mission_content = JSON.json(data)
+				else
+					mission_content = "FAILED VALIDATION: $(val.path)"
+					@error "Validation error: $(val)"
+				end
 			else
 				mission_content = "File not found."
 			end
 		else
 			mission_content = ""
 		end
+		data_name_list = sort([f for f ∈ readdir(FILE_PATH) if endswith(f, ".json")])
 	end
 	@onbutton SendMission begin
 		@info "SendMission to Pi at $(PiIp)"
 		if RASPI_Running[]
 			if !isempty(mission_file)
 				file_path = joinpath(FILE_PATH, mission_file[1])
-				RaspiConnection.upload_mission(file_path, RASPI_IP)
+				ret = RaspiConnection.upload_mission(file_path, RASPI_IP)
+				if !isnothing(ret)
+					@error "Error uploading mission: $ret"
+					notify(model, "Error uploading mission: $ret")
+				end
 			end
 		else
 			@info "not connected"

@@ -4,9 +4,14 @@ module RaspiConnection
 using HTTP
 using JSON
 
+
 const url_base = "ltraspi02.local:4269"
 const PATH = "public/data/dump"
 mkpath(PATH)
+
+using JSONSchema: validate
+using AeroSmurf: AeroSmurf, FILE_PATH, MISSION_SCHEMA
+
 
 # Upload a mission file
 function upload_mission(file_path::String, url::String = url_base)
@@ -17,6 +22,12 @@ function upload_mission(file_path::String, url::String = url_base)
 	j = JSON.parsefile(file_path)
 	rec_serialize(j["commands"])
 	new = tempname()
+	val = validate(MISSION_SCHEMA, j)
+	if !isnothing(val)
+		error("Validation error: $(val)")
+		return val.path
+	else
+	end
 	open(new, "w") do f
 		JSON.print(f, j)
 		# print(j)
@@ -26,8 +37,9 @@ function upload_mission(file_path::String, url::String = url_base)
 		body = HTTP.Form([
 			"file" => json,
 		])
-		HTTP.post(url_full, headers, body)
+		ret = HTTP.post(url_full, headers, body)
 	end
+	return ret.status == 200 ? nothing : "Error uploading mission: $(ret.status)"
 end
 
 # Request found objects (JSON)

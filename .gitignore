@@ -47,5 +47,7 @@ db/*.sqlite
 
 # environment variables file
 .env
+dump/*
 public/uploads/*
 public/data/*
+

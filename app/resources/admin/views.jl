@@ -1,5 +1,4 @@
 module AdminViews
-using Stipple, StippleUI
 using GenieFramework
 
 using AeroSmurf.AdminComponents: connect_item
@@ -42,20 +41,37 @@ function ui_mission()
 		),
 	]
 end
-
-function ui()
-	return [
+function ui_header()
+	quasar(
+		:header,
+		toolbar(
+			[
+				toolbartitle("Admin Panel"),
+			], class = "bg-primary text-white",
+		),
+	)
+end
+function ui_main()
+	card([
 		card(
 			[
-				cardsection([
-					p("{{drone_status}}"),
-				])
-			]
+			cardsection([
+				p("{{drone_status}}"),
+			]),
+		]
 		),
 		ui_con(),
 		separator(color = "primary"),
 		ui_mission(),
-	]
+	])
+end
+
+function ui()
+	StippleUI.layout(view = "hHh Lpr lff",
+		[
+			ui_header(),
+			page_container(
+				ui_main())])
 end
 end
 
