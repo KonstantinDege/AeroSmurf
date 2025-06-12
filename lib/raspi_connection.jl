@@ -51,8 +51,8 @@ function request_objects(url::String = url_base)
 	if resp.status == 200
 		return resp.body  # This is the raw image bytes
 	else
-		error("Failed to get objects: $(resp.status)")
-		1/0
+		# error("Failed to get objects: $(resp.status)")
+		return false
 	end
 end
 
@@ -97,6 +97,9 @@ end
 function get_obj_data(url = url_base)
 	file = "$PATH/__data__.json"
 	response = request_objects(url)
+	if response == false
+		return []
+	end
 	open(file, "w") do f
 		write(f, response)
 	end
