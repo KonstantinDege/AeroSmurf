@@ -4,7 +4,7 @@ using CoordRefSystems, CoordGridTransforms
 using Unitful
 using GLMakie
 using JSON
-PATH = raw"C:\Users\degek\OneDrive\Desktop\images\precalc_omwu3z_6"
+PATH = raw"C:\Users\degek\Desktop\image_tests\images1\precalc_3_lshtos\precalc_mit_o5d7"
 
 const m1 = 1u"m"
 
@@ -36,10 +36,10 @@ function gen_mesh(fov_ver, fov_hor, x_detail = 3, y_detail = 3)
 	uv_buff = Buffer(Vec2f[[x, y] for x in x_range, y in y_range][:])
 	ver = LinearMap(RotXYZ(deg2rad.([0, 0, 90])...)).(
 		[[x, y, -1] for x in LinRange(-sin(fov_hor), sin(fov_hor), x_detail),
-		y in LinRange(-sin(fov_ver), sin(fov_ver), y_detail)][:])
+		 y in LinRange(-sin(fov_ver), sin(fov_ver), y_detail)][:])
 	ver2 = LinearMap(RotXYZ(deg2rad.([0, 0, 90])...)).(
 		[[x, y, -1] for x in LinRange(-sin(fov_hor), sin(fov_hor), 3),
-		y in LinRange(-sin(fov_ver), sin(fov_ver), 3)][:])
+		 y in LinRange(-sin(fov_ver), sin(fov_ver), 3)][:])
 
 	(transform, drone_pos, offset = 0) -> begin
 		vertices = Point3f.([project_onto_z(drone_pos, v) + Point3f(0, 0, offset) for v in transform.(ver)])
@@ -73,7 +73,7 @@ end
 function render(fig)
 	count = 1
 	allready_rendered = []
-	scene = LScene(fig[1, 1])
+	scene = LScene(fig[1, 1], show_axis = false)
 	poses = Observable(Point3f[])
 	origin = get_xy(48.7670587, 11.334912)
 	lines!(scene, poses)
@@ -81,23 +81,23 @@ function render(fig)
 	json = get_data_from_json()
 	add_to_scene(scene, json, allready_rendered, count, poses, origin)
 
-    annotad(scene, origin)
+	annotad(scene, origin)
 
 end
 
 function annotad(scene, origin)
-    data = JSON.parsefile(joinpath(PATH, raw"__data_filtered__.json"))
-    points = Point3f[]
-    names = String[]
-    colors = []
-    for (color, objs) ∈ data
-        for obj ∈ objs
-            pos = get_xy(obj["lat"], obj["lon"]) - origin
-            push!(points, pos)
-            push!(names, string(obj["id"]))
-        end
-    end
-    text!(scene, points, text=names)
+	data = JSON.parsefile(joinpath(PATH, raw"__data_filtered__.json"))
+	points = Point3f[]
+	names = String[]
+	colors = []
+	for (color, objs) ∈ data
+		for obj ∈ objs
+			pos = get_xy(obj["lat"], obj["lon"]) - origin
+			push!(points, pos)
+			push!(names, string(obj["id"]))
+		end
+	end
+	text!(scene, points, text = names)
 end
 
 function add_to_scene(scene, json, allready_rendered, count, poses, origin)
@@ -111,7 +111,7 @@ function add_to_scene(scene, json, allready_rendered, count, poses, origin)
 		end
 		png = load(path)
 		attitude = image["image_pos"][6:-1:4]
-        attitude = [-attitude[1], attitude[2], -attitude[3]]
+		attitude = [-attitude[1], attitude[2], -attitude[3]]
 		if image["height"] < -4
 			continue
 		end
