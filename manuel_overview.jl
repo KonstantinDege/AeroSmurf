@@ -1,11 +1,10 @@
-module OverviewMap
 using CoordinateTransformations, Rotations
 using MeshIO, FileIO, GeometryBasics, LinearAlgebra
 using CoordRefSystems, CoordGridTransforms
 using Unitful
-include("raspi_connection.jl")
-using .RaspiConnection: PATH, read_json_lines
 using GLMakie
+using JSON
+PATH = raw"C:\Users\degek\OneDrive\Desktop\images\precalc_omwu3z_6"
 
 const m1 = 1u"m"
 
@@ -63,7 +62,9 @@ const mesh_gen = gen_mesh(fov_ver, fov_hor, 5, 5)
 
 function get_data_from_json()
 	file = "$PATH/__data__.json"
-    if !isfile(file) return [] end
+	if !isfile(file)
+		return []
+	end
 	open(file, "r") do f
 		return read_json_lines(f)
 	end
@@ -71,19 +72,32 @@ end
 
 function render(fig)
 	count = 1
-    allready_rendered = []
+	allready_rendered = []
 	scene = LScene(fig[1, 1])
 	poses = Observable(Point3f[])
 	origin = get_xy(48.7670587, 11.334912)
 	lines!(scene, poses)
 
-    @async begin
-        while true
-            json = get_data_from_json()
-            add_to_scene(scene, json, allready_rendered, count, poses, origin)
-            sleep(5)
+	json = get_data_from_json()
+	add_to_scene(scene, json, allready_rendered, count, poses, origin)
+
+    annotad(scene, origin)
+
+end
+
+function annotad(scene, origin)
+    data = JSON.parsefile(joinpath(PATH, raw"__data_filtered__.json"))
+    points = Point3f[]
+    names = String[]
+    colors = []
+    for (color, objs) ∈ data
+        for obj ∈ objs
+            pos = get_xy(obj["lat"], obj["lon"]) - origin
+            push!(points, pos)
+            push!(names, string(obj["id"]))
         end
     end
+    text!(scene, points, text=names)
 end
 
 function add_to_scene(scene, json, allready_rendered, count, poses, origin)
@@ -97,11 +111,12 @@ function add_to_scene(scene, json, allready_rendered, count, poses, origin)
 		end
 		png = load(path)
 		attitude = image["image_pos"][6:-1:4]
+        attitude = [-attitude[1], attitude[2], -attitude[3]]
 		if image["height"] < -4
 			continue
 		end
-        @info image["time"]
-        llh_raw = get_xy(image["image_pos"][1:2]...) - origin - Point3f(11140.25, 0, 0.0)
+		@info image["time"]
+		llh_raw = get_xy(image["image_pos"][1:2]...) - origin
 		pos = llh_raw + Point3f(0, 0, image["height"])
 
 		m, original_vecs = mesh_gen(gen_rotate(attitude), pos, 1e-4 * count)
@@ -120,5 +135,10 @@ function get_xy(lat, lon)
 	pos = convert(Mercator, LatLon(lat, lon))
 	return Point3f(pos.x / m1, pos.y / m1, 0.0)
 end
-
+function read_json_lines(file_path)
+	results = []
+	for line in eachline(file_path)
+		push!(results, JSON.Parser.parse(line))
+	end
+	return results
 end
