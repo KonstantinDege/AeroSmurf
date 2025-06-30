@@ -96,7 +96,7 @@ function annotad(scene, origin)
 	colors = []
 	for (color, objs) ∈ data
 		for obj ∈ objs
-			pos = get_xy(obj["lat"], obj["lon"]) - origin
+			pos = get_xy(obj["lat"], obj["lon"]) - origin + Point3f(0,0,1)
 			push!(points, pos)
 			push!(names, string(obj["id"]))
 		end
