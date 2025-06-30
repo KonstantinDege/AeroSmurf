@@ -3,7 +3,7 @@ module ImageController
 
 # Build something great
 using GenieFramework
-const FILE_PATH = joinpath("public", "dump", "data")
+const FILE_PATH = joinpath("public", "data", "dump")
 mkpath(FILE_PATH)
 using Stipple
 

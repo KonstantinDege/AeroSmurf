@@ -7,10 +7,10 @@ function create_rec_table(path)
 		js = JSON.parsefile(path)
 		for (key, v) in js
 			df = DataFrame(v)
-			df.shape .= k
 			df.color .= key
 			out = vcat(out, df)
 		end
+		select!(out, Not([:time, :ids]))
 	catch
 		return DataFrame()
 	end

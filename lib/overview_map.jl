@@ -6,6 +6,7 @@ using Unitful
 include("raspi_connection.jl")
 using .RaspiConnection: PATH, read_json_lines
 using GLMakie
+using JSON
 
 const m1 = 1u"m"
 
@@ -72,7 +73,7 @@ end
 function render(fig)
 	count = 1
     allready_rendered = []
-	scene = LScene(fig[1, 1])
+	scene = LScene(fig[1, 1], show_axis = false)
 	poses = Observable(Point3f[])
 	origin = get_xy(48.7670587, 11.334912)
 	lines!(scene, poses)
@@ -84,6 +85,23 @@ function render(fig)
             sleep(5)
         end
     end
+
+	annotad(scene, origin)
+end
+
+function annotad(scene, origin)
+	data = JSON.parsefile(joinpath(PATH, raw"__data_filtered__.json"))
+	points = Point3f[]
+	names = String[]
+	colors = []
+	for (color, objs) ∈ data
+		for obj ∈ objs
+			pos = get_xy(obj["lat"], obj["lon"]) - origin
+			push!(points, pos)
+			push!(names, string(obj["id"]))
+		end
+	end
+	text!(scene, points, text = names)
 end
 
 function add_to_scene(scene, json, allready_rendered, count, poses, origin)
@@ -97,11 +115,12 @@ function add_to_scene(scene, json, allready_rendered, count, poses, origin)
 		end
 		png = load(path)
 		attitude = image["image_pos"][6:-1:4]
+		attitude = [attitude[1]+90, attitude[2], -attitude[3]]
 		if image["height"] < -4
 			continue
 		end
         @info image["time"]
-        llh_raw = get_xy(image["image_pos"][1:2]...) - origin - Point3f(11140.25, 0, 0.0)
+        llh_raw = get_xy(image["image_pos"][1:2]...) - origin
 		pos = llh_raw + Point3f(0, 0, image["height"])
 
 		m, original_vecs = mesh_gen(gen_rotate(attitude), pos, 1e-4 * count)

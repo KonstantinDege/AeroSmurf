@@ -2,7 +2,7 @@ include("lib/raspi_connection.jl")
 using .RaspiConnection
 using Base.Threads
 
-FILE_PATH = joinpath("public", "dump", "data")
+FILE_PATH = joinpath("public", "data", "dump")
 mkpath(FILE_PATH)
 
 function clear_path(path = FILE_PATH)
